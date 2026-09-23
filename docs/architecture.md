@@ -2,7 +2,7 @@
 
 ## Scope
 
-本阶段是纯本地 deterministic core：
+Milestone 1 是纯本地 deterministic core；Milestone 2 增加了一个不改变核心逻辑的本地 Web boundary：
 
 ```text
 source string
@@ -13,6 +13,18 @@ source string
   → NAND compiler
   → TapeOut byte encoder
   → independent NAND evaluator
+
+Milestone 2 的关系是：
+
+```text
+Browser UI
+  → POST /api/build
+  → Python server boundary
+  → gatesmith_core authoritative implementation
+  → JSON metadata for rendering
+```
+
+浏览器没有重新实现 parser、compiler 或 evaluator。API 在返回结果前还会使用 NAND evaluator 对 truth table 做一次一致性检查。该 boundary 只在本地提供 HTTP，不连接 AI、wallet、RPC 或 X Layer。
 ```
 
 代码不依赖 React、AI provider、wallet、RPC 或 TapeOut frontend。
@@ -86,3 +98,9 @@ is compiled by the generic two-input truth-table optimizer, not by a string or b
 - invalid/future signal references are rejected by the encoder.
 
 These are safety limits for V0.1, not claims about the maximum X Layer circuit size.
+
+## Milestone 2 UI boundary
+
+当前 UI 只覆盖 `Rule → Verify → Circuit`：输入 expression、调用本地 Python core、展示 normalized rule、完整 truth table、Circuit summary、bytes/hash technical evidence，以及本地 `Confirm Rule` 状态。修改输入会使此前确认失效。
+
+本阶段没有 AI interpretation、钱包、Processor、tape-out 或 `eval()`；UI 中的确认只是对当前本地 compiled artifact 的人工确认，不是链上签名。

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GateSmith · Rule to Circuit</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/"><span class="brand-mark">G</span><span>GateSmith</span></a>
+        <span class="local-badge"><i></i> LOCAL CORE · M2</span>
+      </header>
+
+      <section class="hero">
+        <div class="eyebrow">RULE → VERIFY → CIRCUIT</div>
+        <h1>Make a rule<br /><em>you can inspect.</em></h1>
+        <p class="hero-copy">Turn a small Boolean rule into a deterministic NAND circuit. No magic, no hidden logic — review every input before it becomes an artifact.</p>
+      </section>
+
+      <section class="panel rule-panel">
+        <div class="panel-heading"><div><span class="step">01</span><h2>Describe your rule</h2></div><span class="hint">AND · OR · NOT · A–D</span></div>
+        <label for="expression">Boolean expression</label>
+        <div class="input-row"><input id="expression" value="(A AND B) OR C" autocomplete="off" spellcheck="false" /><button id="build">Build Circuit <span>↗</span></button></div>
+        <p class="helper">Try: <button class="example" data-expression="(A AND B) OR C">(A AND B) OR C</button> <button class="example" data-expression="NOT (A OR B)">NOT (A OR B)</button></p>
+        <div id="error" class="error" role="alert" hidden></div>
+      </section>
+
+      <section id="result" hidden>
+        <div class="panel review-panel">
+          <div class="panel-heading"><div><span class="step">02</span><h2>Review the rule</h2></div><span class="status status-local">LOCAL VERIFIED</span></div>
+          <div class="rule-card"><span class="label">NORMALIZED RULE</span><code id="normalized"></code></div>
+          <div class="table-wrap"><table><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+        </div>
+
+        <div class="split">
+          <section class="panel summary-panel"><div class="panel-heading"><div><span class="step">03</span><h2>Circuit preview</h2></div></div><div class="metrics"><div><strong id="input-count">—</strong><span>inputs</span></div><div><strong id="gate-count">—</strong><span>NAND gates</span></div><div><strong id="output-count">1</strong><span>output</span></div><div><strong id="byte-length">—</strong><span>bytes</span></div></div><div class="flow"><span>BOOLEAN</span><b>→</b><span>AST</span><b>→</b><span>NAND</span><b>→</b><span>BYTES</span></div></section>
+          <section class="panel confirm-panel"><div class="panel-heading"><div><span class="step">04</span><h2>Confirm artifact</h2></div></div><p>Confirm that the normalized rule, truth table, and compiled circuit match your intent.</p><button id="confirm" class="confirm-button" disabled>Confirm Rule</button><div id="confirm-state" class="confirm-state">Not confirmed</div></section>
+        </div>
+
+        <details class="panel evidence-panel"><summary><span><span class="step">TECH</span> Circuit evidence</span><span class="details-toggle">View details +</span></summary><div class="evidence-grid"><div><span class="label">ENCODED NETLIST</span><code id="netlist-bytes"></code></div><div><span class="label">DETERMINISTIC SHA-256</span><code id="netlist-hash"></code></div></div></details>
+      </section>
+
+      <footer><span>Milestone 2 · Local deterministic core</span><span>Wallet &amp; chain integration are not active</span></footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

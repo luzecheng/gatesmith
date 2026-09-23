@@ -14,6 +14,14 @@ GateSmith 把受支持的 Boolean expression 确定性地编译成 NAND-only net
 python3 -m unittest discover -s tests -v
 ```
 
+启动本地 UI：
+
+```bash
+python3 server.py 8765
+```
+
+然后打开 `http://127.0.0.1:8765`。M2 UI 只调用 Python authoritative core；当前没有 AI、钱包、RPC、Processor、tape-out 或 `eval()`。
+
 支持的语法：
 
 ```text
