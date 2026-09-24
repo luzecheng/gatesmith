@@ -5,54 +5,179 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GateSmith · Rule to Circuit</title>
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/demo-polish.css" />
+    <link rel="stylesheet" href="/visual-polish-v02.css" />
+    <link rel="stylesheet" href="/bilingual.css" />
   </head>
   <body>
     <main class="shell">
       <header class="topbar">
         <a class="brand" href="/"><span class="brand-mark">G</span><span>GateSmith</span></a>
-        <span class="local-badge"><i></i> LOCAL CORE · M2</span>
+        <div class="topbar-tools"><span class="local-badge"><i></i> <span data-i18n="publicDemo">PUBLIC DEMO · V0.1</span></span><div class="language-switch" aria-label="Language"><button id="language-en" type="button" data-language="en">EN</button><span>|</span><button id="language-zh" type="button" data-language="zh">中文</button></div></div>
       </header>
 
       <section class="hero">
-        <div class="eyebrow">RULE → VERIFY → CIRCUIT</div>
-        <h1>Make a rule<br /><em>you can inspect.</em></h1>
-        <p class="hero-copy">Turn a small Boolean rule into a deterministic NAND circuit. No magic, no hidden logic — review every input before it becomes an artifact.</p>
+        <div class="eyebrow" data-i18n="heroEyebrow">RULE → VERIFY → CIRCUIT</div>
+        <h1><span data-i18n="heroTitle">Make a rule</span><br /><em data-i18n="heroTitleEm">you can inspect.</em></h1>
+        <p class="hero-copy" data-i18n="heroCopy">Turn a human rule into a Boolean circuit you can inspect locally and verify live on X Layer.</p>
       </section>
 
+      <section class="trust-strip" aria-label="GateSmith trust boundary">
+        <div><strong data-i18n="trustAiTitle">AI proposes.</strong><span data-i18n="trustAiCopy">Interpretation is optional and not verified.</span></div>
+        <div><strong data-i18n="trustHumanTitle">Humans confirm.</strong><span data-i18n="trustHumanCopy">You review the Boolean meaning and truth table.</span></div>
+        <div><strong data-i18n="trustCodeTitle">Deterministic code compiles.</strong><span data-i18n="trustCodeCopy">The local core produces the NAND artifact.</span></div>
+        <div><strong data-i18n="trustChainTitle">X Layer executes.</strong><span data-i18n="trustChainCopy">Live `eval()` results are read-only evidence.</span></div>
+      </section>
+
+      <details class="advanced-controls">
+        <summary><span data-i18n="advancedTitle">Advanced / Product Owner Controls</span><span data-i18n="advancedCopy">Mainnet write operations · not part of the normal public demo flow</span></summary>
+        <div class="advanced-body">
+      <section class="panel deployment-panel" aria-labelledby="deployment-title">
+        <div class="panel-heading"><div><span class="step">MAINNET</span><h2 id="deployment-title" data-i18n="deployTitle">Deploy GateSmith Processor</h2></div><span class="hint" data-i18n="walletManual">OKX Wallet · manual confirmation only</span></div>
+        <p class="deployment-copy" data-i18n="deployCopy">This is a review-only transaction request for the frozen X Layer deployment. GateSmith never receives keys and never signs or sends automatically.</p>
+        <div class="deployment-actions">
+          <button id="connect-wallet" class="secondary-button" data-i18n="connectWallet">Connect OKX Wallet</button>
+          <button id="review-deployment" class="confirm-button" data-i18n="reviewDeployment" disabled>Review Deployment</button>
+        </div>
+        <div id="wallet-error" class="error" role="alert" hidden></div>
+        <div id="wallet-state" class="wallet-state" data-i18n="walletNotConnected" aria-live="polite">Wallet not connected</div>
+        <div id="deployment-review" class="deployment-review" hidden>
+          <div class="deployment-status"><span class="label" data-i18n="readyToReview">READY TO REVIEW</span><span id="deployment-guard" class="guard-badge" data-i18n="hardStopPassed">HARD-STOP CHECKS PASSED</span></div>
+          <dl class="deployment-fields">
+            <div><dt data-i18n="networkLabel">Network</dt><dd>X Layer Mainnet · chain ID 196</dd></div>
+            <div><dt data-i18n="walletLabel">Connected wallet</dt><dd id="review-wallet"></dd></div>
+            <div><dt data-i18n="factoryLabel">Factory</dt><dd>0x1f09daefa827f02cbb40967cc91b259763760761</dd></div>
+            <div><dt data-i18n="methodLabel">Method</dt><dd>createCPU</dd></div>
+            <div><dt data-i18n="nameLabel">name</dt><dd>GateSmith</dd></div>
+            <div><dt data-i18n="symbolLabel">symbol</dt><dd>GATE</dd></div>
+            <div><dt data-i18n="storyLabel">story</dt><dd>Turn human-readable Boolean rules into deterministic, verifiable on-chain circuits.</dd></div>
+            <div><dt data-i18n="supplyCapLabel">supplyCap</dt><dd>10000000000</dd></div>
+            <div><dt data-i18n="mintPriceLabel">mintPrice</dt><dd>50000000000000 wei</dd></div>
+            <div><dt data-i18n="valueLabel">msg.value</dt><dd>6600000000000000 wei · 0.0066 OKB</dd></div>
+            <div><dt data-i18n="calldataHashLabel">calldata SHA-256</dt><dd>f38c298535fa89e2ae8b5b78f97c28aef5d56d4c3623f64df3dadff10edaeac5</dd></div>
+          </dl>
+          <p class="deployment-warning" data-i18n="deployWarning">Deploy opens an OKX Wallet confirmation request only after you click the button. Review target, value, network, and calldata in OKX Wallet before confirming.</p>
+          <button id="deploy-processor" class="confirm-button deploy-button" data-i18n="deployTitle" disabled>Deploy GateSmith Processor</button>
+          <div id="deployment-result" class="wallet-state" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel deployment-panel mint-panel" aria-labelledby="mint-title">
+        <div class="panel-heading"><div><span class="step">GENESIS</span><h2 id="mint-title" data-i18n="mintTitle">Genesis Circuit · Mint Transistors</h2></div><span class="hint" data-i18n="walletManual">OKX Wallet · manual confirmation only</span></div>
+        <p class="deployment-copy" data-i18n="mintCopy">Mint only the frozen NAND inventory for the Genesis Circuit. Review is read-only; the wallet request is created only by the final mint button.</p>
+        <div class="deployment-actions"><button id="review-mint" class="confirm-button" data-i18n="reviewMint" disabled>Review Mint</button></div>
+        <div id="mint-error" class="error" role="alert" hidden></div>
+        <div id="mint-review" class="deployment-review" hidden>
+          <div class="deployment-status"><span class="label">GENESIS MINT REVIEW</span><span class="guard-badge">HARD-STOP CHECKS PASSED</span></div>
+          <dl class="deployment-fields">
+            <div><dt data-i18n="genesisCircuitLabel">Genesis Circuit</dt><dd>A AND B</dd></div>
+            <div><dt data-i18n="requiredNandLabel">Required NAND</dt><dd>2</dd></div>
+            <div><dt data-i18n="transistor">Transistor</dt><dd>0xe0f29a43d89e471f9eea723dcda9d731043f34d7</dd></div>
+            <div><dt data-i18n="primitiveLabel">primitiveId</dt><dd>0 (NAND)</dd></div>
+            <div><dt data-i18n="amountLabel">amount</dt><dd>2</dd></div>
+            <div><dt data-i18n="protocolFeeLabel">protocolFee</dt><dd>660000000000000 wei</dd></div>
+            <div><dt data-i18n="mintPriceLabel">mintPrice</dt><dd>50000000000000 wei / transistor</dd></div>
+            <div><dt data-i18n="valueLabel">msg.value</dt><dd>760000000000000 wei · 0.00076 OKB</dd></div>
+            <div><dt data-i18n="sha256">netlist SHA-256</dt><dd>8d6caeafdb7825cc5c790a214acd0c8b22cb827eb669cc67735a0d31a2f86c99</dd></div>
+          </dl>
+          <p class="deployment-warning" data-i18n="mintWarning">Mint opens an OKX Wallet confirmation request only after you click the button. Confirm target, amount, value, and network in OKX Wallet.</p>
+          <button id="mint-transistors" class="confirm-button deploy-button" data-i18n="mintButton" disabled>Mint 2 NAND Transistors</button>
+          <div id="mint-result" class="wallet-state" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel deployment-panel mint-panel" aria-labelledby="tapeout-title">
+        <div class="panel-heading"><div><span class="step">TAPEOUT</span><h2 id="tapeout-title" data-i18n="tapeoutTitle">Genesis Circuit · Tape Out</h2></div><span class="hint" data-i18n="walletExact">OKX Wallet · exact value only</span></div>
+        <p class="deployment-copy" data-i18n="tapeoutCopy">Create the frozen A AND B Circuit only after reviewing the exact netlist, inventory, calldata, and tapeout value.</p>
+        <div class="deployment-actions"><button id="review-tapeout" class="confirm-button" data-i18n="reviewTapeout" disabled>Review Tapeout</button></div>
+        <div id="tapeout-error" class="error" role="alert" hidden></div>
+        <div id="tapeout-review" class="deployment-review" hidden>
+          <div class="deployment-status"><span class="label">GENESIS TAPEOUT REVIEW</span><span class="guard-badge">HARD-STOP CHECKS PASSED</span></div>
+          <dl class="deployment-fields">
+            <div><dt data-i18n="genesisCircuitLabel">Genesis Circuit</dt><dd>A AND B</dd></div>
+            <div><dt data-i18n="humanRuleLabel">Human rule</dt><dd>Approve only when both Alice and Bob approve.</dd></div>
+            <div><dt data-i18n="truthTableLabel">Truth table</dt><dd>00 → 0 · 01 → 0 · 10 → 0 · 11 → 1</dd></div>
+            <div><dt data-i18n="processor">Processor</dt><dd>0x40dd85697dfbba97887c6dd058d2396edd83e826</dd></div>
+            <div><dt data-i18n="requiredNandLabel">Required NAND</dt><dd>2</dd></div>
+            <div><dt data-i18n="currentInventoryLabel">Current NAND inventory</dt><dd id="tapeout-inventory">2</dd></div>
+            <div><dt data-i18n="netlist">Netlist</dt><dd>0x0000000200000300000001000004</dd></div>
+            <div><dt data-i18n="inputsOutputsLabel">Inputs / outputs</dt><dd>2 / 1</dd></div>
+            <div><dt data-i18n="sha256">Netlist SHA-256</dt><dd>8d6caeafdb7825cc5c790a214acd0c8b22cb827eb669cc67735a0d31a2f86c99</dd></div>
+            <div><dt data-i18n="exactCalldataLabel">Exact calldata SHA-256</dt><dd>b22cd0fdd965c312fe38fbd8950945c4f4606b718d58870d52e6c52f600e74da</dd></div>
+            <div><dt data-i18n="tapeoutValueLabel">Tapeout value</dt><dd>1300000000000000 wei · 0.0013 OKB</dd></div>
+          </dl>
+          <p class="deployment-warning" data-i18n="tapeoutWarning">Tape Out opens an OKX Wallet confirmation request only after you click the final button. The tapeout value must be exactly 0.0013 OKB; no buffer is added.</p>
+          <button id="tapeout-circuit" class="confirm-button deploy-button" data-i18n="tapeoutButton" disabled>Tape Out Genesis Circuit</button>
+          <div id="tapeout-result" class="wallet-state" aria-live="polite"></div>
+        </div>
+      </section>
+
+        </div>
+      </details>
+
       <section class="panel rule-panel">
-        <div class="panel-heading"><div><span class="step">01</span><h2>Describe your rule</h2></div><span class="hint">AI optional · local core required</span></div>
-        <label for="description">Plain-language rule <span class="optional">optional</span></label>
-        <div class="input-row"><textarea id="description" rows="2" placeholder="Allow access when Alice and Bob approve, or Carol approves."></textarea><button id="interpret">Ask AI <span>↗</span></button></div>
+        <div class="panel-heading"><div><span class="step">01</span><h2 data-i18n="ruleTitle">Enter a human rule</h2></div><span class="hint" data-i18n="ruleHint">AI optional · deterministic core required</span></div>
+        <label for="description" data-i18n="plainRule">Plain-language rule <span class="optional" data-i18n="optional">optional</span></label>
+        <div class="input-row"><textarea id="description" rows="2" data-i18n-placeholder="defaultRule" placeholder="Approve only when both Alice and Bob approve.">Approve only when both Alice and Bob approve.</textarea><button id="interpret" data-i18n="askAi">Ask AI <span>↗</span></button></div>
         <div id="proposal" class="proposal" hidden>
-          <div class="proposal-heading"><span class="label">AI PROPOSED INTERPRETATION</span><span class="proposal-badge">NOT VERIFIED</span></div>
+          <div class="proposal-heading"><span class="label" data-i18n="aiProposal">AI PROPOSED INTERPRETATION</span><span class="proposal-badge" data-i18n="notVerified">NOT VERIFIED</span></div>
           <div id="proposal-inputs" class="proposal-inputs"></div>
-          <div class="proposal-rule"><span class="label">PROPOSED BOOLEAN RULE</span><code id="proposal-expression"></code></div>
+          <div class="proposal-rule"><span class="label" data-i18n="proposedBoolean">PROPOSED BOOLEAN RULE</span><code id="proposal-expression"></code></div>
           <p id="proposal-explanation" class="proposal-explanation"></p>
           <div id="proposal-warning" class="proposal-warning" hidden></div>
-          <div class="proposal-actions"><button id="use-proposal" class="secondary-button">Use this expression</button><button id="reject-proposal" class="text-button">Reject</button></div>
+          <div class="proposal-actions"><button id="use-proposal" class="secondary-button" data-i18n="useExpression">Use this expression</button><button id="reject-proposal" class="text-button" data-i18n="reject">Reject</button></div>
         </div>
-        <label for="expression">Boolean expression</label>
-        <div class="input-row"><input id="expression" value="(A AND B) OR C" autocomplete="off" spellcheck="false" /><button id="build">Build Circuit <span>↗</span></button></div>
-        <p class="helper">Try: <button class="example" data-expression="(A AND B) OR C">(A AND B) OR C</button> <button class="example" data-expression="NOT (A OR B)">NOT (A OR B)</button></p>
+        <label for="expression" data-i18n="booleanExpression">Boolean expression</label>
+        <div class="input-row"><input id="expression" value="A AND B" autocomplete="off" spellcheck="false" /><button id="build" data-i18n="buildRule">Build Boolean Rule <span>↗</span></button></div>
+        <p class="helper"><span data-i18n="tryExamples">Try:</span> <button class="example" data-expression="(A AND B) OR C">(A AND B) OR C</button> <button class="example" data-expression="NOT (A OR B)">NOT (A OR B)</button></p>
         <div id="error" class="error" role="alert" hidden></div>
       </section>
 
       <section id="result" hidden>
         <div class="panel review-panel">
-          <div class="panel-heading"><div><span class="step">02</span><h2>Review the rule</h2></div><span class="status status-local">LOCAL VERIFIED</span></div>
-          <div class="rule-card"><span class="label">NORMALIZED RULE</span><code id="normalized"></code></div>
+          <div class="panel-heading"><div><span class="step">02</span><h2 data-i18n="reviewBoolean">Review Boolean rule</h2></div><span class="status status-local" data-i18n="localResult">DETERMINISTIC LOCAL RESULT</span></div>
+          <div class="rule-card"><span class="label" data-i18n="normalizedRule">NORMALIZED RULE</span><code id="normalized"></code></div>
           <div class="table-wrap"><table><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
         </div>
 
         <div class="split">
-          <section class="panel summary-panel"><div class="panel-heading"><div><span class="step">03</span><h2>Circuit preview</h2></div></div><div class="metrics"><div><strong id="input-count">—</strong><span>inputs</span></div><div><strong id="gate-count">—</strong><span>NAND gates</span></div><div><strong id="output-count">1</strong><span>output</span></div><div><strong id="byte-length">—</strong><span>bytes</span></div></div><div class="flow"><span>BOOLEAN</span><b>→</b><span>AST</span><b>→</b><span>NAND</span><b>→</b><span>BYTES</span></div></section>
-          <section class="panel confirm-panel"><div class="panel-heading"><div><span class="step">04</span><h2>Confirm artifact</h2></div></div><p>Confirm that the normalized rule, truth table, and compiled circuit match your intent.</p><button id="confirm" class="confirm-button" disabled>Confirm Rule</button><div id="confirm-state" class="confirm-state">Not confirmed</div></section>
+          <section class="panel summary-panel"><div class="panel-heading"><div><span class="step">03</span><h2 data-i18n="nandCircuit">Deterministic NAND circuit</h2></div></div><div class="metrics"><div><strong id="input-count">—</strong><span data-i18n="inputs">inputs</span></div><div><strong id="gate-count">—</strong><span data-i18n="nandGates">NAND gates</span></div><div><strong id="output-count">1</strong><span data-i18n="output">output</span></div><div><strong id="byte-length">—</strong><span data-i18n="bytes">bytes</span></div></div><div class="flow"><span>BOOLEAN</span><b>→</b><span>AST</span><b>→</b><span>NAND</span><b>→</b><span>BYTES</span></div></section>
+          <section class="panel confirm-panel"><div class="panel-heading"><div><span class="step">04</span><h2 data-i18n="confirmArtifact">Confirm artifact</h2></div></div><p data-i18n="confirmCopy">Confirm that the normalized rule, truth table, and compiled circuit match your intent.</p><button id="confirm" class="confirm-button" data-i18n="confirmRule" disabled>Confirm Rule</button><div id="confirm-state" class="confirm-state">Not confirmed</div></section>
         </div>
 
-        <details class="panel evidence-panel"><summary><span><span class="step">TECH</span> Circuit evidence</span><span class="details-toggle">View details +</span></summary><div class="evidence-grid"><div><span class="label">ENCODED NETLIST</span><code id="netlist-bytes"></code></div><div><span class="label">DETERMINISTIC SHA-256</span><code id="netlist-hash"></code></div></div></details>
+        <details class="panel evidence-panel"><summary><span><span class="step">TECH</span> <span data-i18n="circuitEvidence">Circuit evidence</span></span><span class="details-toggle" data-i18n="viewDetails">View details +</span></summary><div class="evidence-grid"><div><span class="label" data-i18n="encodedNetlist">ENCODED NETLIST</span><code id="netlist-bytes"></code></div><div><span class="label" data-i18n="deterministicHash">DETERMINISTIC SHA-256</span><code id="netlist-hash"></code></div></div></details>
       </section>
 
-      <footer><span>Milestone 4 · AI proposal + local deterministic core</span><span>AI is optional · Wallet &amp; chain integration are not active</span></footer>
+      <section class="panel genesis-panel" aria-labelledby="genesis-title">
+        <div class="genesis-kicker">GATESMITH GENESIS CIRCUIT</div>
+        <div class="genesis-title-row"><div><h2 id="genesis-title">A AND B</h2><p data-i18n="genesisMeaning">Approve only when both Alice and Bob approve.</p></div><div class="genesis-badges"><span class="genesis-badge" data-i18n="circuitOne">CIRCUIT #1</span><span class="genesis-badge" data-i18n="xLayerMainnet">X LAYER MAINNET</span></div></div>
+        <p class="genesis-intro" data-i18n="genesisIntro">Try any rule locally above. Below is GateSmith’s deployed Genesis example: A AND B, taped out as Circuit #1 on X Layer Mainnet.</p>
+        <div class="genesis-proof-line"><strong data-i18n="twoNand">2 NAND gates</strong><span data-i18n="localEqualsLive">Local deterministic result = X Layer Circuit #1</span></div>
+        <div class="genesis-grid">
+          <dl class="evidence-fields">
+            <div><dt data-i18n="network">Network</dt><dd>X Layer Mainnet · chain ID 196</dd></div>
+            <div><dt data-i18n="cpuId">CPU ID</dt><dd>237</dd></div>
+            <div><dt data-i18n="processor">Processor</dt><dd><code>0x40dd85697dfbba97887c6dd058d2396edd83e826</code><button class="copy-button" data-copy="0x40dd85697dfbba97887c6dd058d2396edd83e826" data-i18n="copy">Copy</button></dd></div>
+            <div><dt data-i18n="transistor">Transistor</dt><dd><code>0xe0f29a43d89e471f9eea723dcda9d731043f34d7</code><button class="copy-button" data-copy="0xe0f29a43d89e471f9eea723dcda9d731043f34d7" data-i18n="copy">Copy</button></dd></div>
+            <div><dt data-i18n="circuitId">Circuit ID</dt><dd>1</dd></div>
+            <div><dt data-i18n="rule">Rule</dt><dd>A AND B</dd></div>
+            <div><dt data-i18n="meaning">Meaning</dt><dd data-i18n="genesisMeaning">Approve only when both Alice and Bob approve.</dd></div>
+            <div><dt data-i18n="nand">NAND</dt><dd>2</dd></div>
+            <div><dt data-i18n="netlist">Netlist</dt><dd><code>0x0000000200000300000001000004</code><button class="copy-button" data-copy="0x0000000200000300000001000004" data-i18n="copy">Copy</button></dd></div>
+            <div><dt data-i18n="sha256">Netlist SHA-256</dt><dd><code>8d6caeafdb7825cc5c790a214acd0c8b22cb827eb669cc67735a0d31a2f86c99</code><button class="copy-button" data-copy="8d6caeafdb7825cc5c790a214acd0c8b22cb827eb669cc67735a0d31a2f86c99" data-i18n="copy">Copy</button></dd></div>
+          </dl>
+          <div class="live-panel">
+            <div class="live-heading"><span class="label" data-i18n="liveVerification">LIVE X LAYER VERIFICATION</span><span id="live-status" class="live-status">Not run</span></div>
+            <p class="section-copy" data-i18n="liveCopy">Runs four read-only `eth_call` evaluations against Circuit #1. A failure is shown as failure; it is never reported as verified.</p>
+            <table class="live-table"><thead><tr><th data-i18n="input">INPUT</th><th data-i18n="local">LOCAL</th><th data-i18n="xLayer">X LAYER</th><th data-i18n="result">RESULT</th></tr></thead><tbody id="live-results"></tbody></table>
+            <button id="verify-genesis" class="confirm-button" data-i18n="verifyXLayer">Verify on X Layer</button>
+            <div id="live-error" class="error" role="alert" hidden></div>
+          </div>
+        </div>
+        <details class="mainnet-evidence"><summary><span data-i18n="mainnetEvidence">Public Mainnet transaction evidence</span><span class="details-toggle" data-i18n="copyHashes">Copy transaction hashes +</span></summary><div class="evidence-grid"><div><span class="label" data-i18n="processorCreation">PROCESSOR CREATION</span><code class="tx-value">0xb3edbbeed00b44276a38781cfbd4b7d6108fda6dffa3202cfa8721f87da00229</code><button class="copy-button" data-copy="0xb3edbbeed00b44276a38781cfbd4b7d6108fda6dffa3202cfa8721f87da00229" data-i18n="copy">Copy</button></div><div><span class="label" data-i18n="transistorMint">TRANSISTOR MINT</span><code class="tx-value">0xf91118e00295d7732f459010acd02c2a5c5bfd78d80880f89a452bc1ecf9699e</code><button class="copy-button" data-copy="0xf91118e00295d7732f459010acd02c2a5c5bfd78d80880f89a452bc1ecf9699e" data-i18n="copy">Copy</button></div><div><span class="label" data-i18n="genesisTapeout">GENESIS TAPEOUT</span><code class="tx-value">0x4317e6503fb7dbedf467872f28bb53f587d4b2b9373c6873d340d169e527915a</code><button class="copy-button" data-copy="0x4317e6503fb7dbedf467872f28bb53f587d4b2b9373c6873d340d169e527915a" data-i18n="copy">Copy</button></div><p class="explorer-note" data-i18n="explorerNote">Explorer deep links unavailable; verification uses direct X Layer RPC.</p></div></details>
+      </section>
+
+      <footer><span data-i18n="footerLeft">GateSmith MVP · proposal, deterministic compile, live evidence</span><span data-i18n="footerRight">Public demo is read-only by default</span></footer>
     </main>
     <script src="/app.js"></script>
   </body>

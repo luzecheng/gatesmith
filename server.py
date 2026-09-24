@@ -128,6 +128,15 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/styles.css":
             self._file(WEB_ROOT / "styles.css", "text/css; charset=utf-8")
             return
+        if self.path == "/demo-polish.css":
+            self._file(WEB_ROOT / "demo-polish.css", "text/css; charset=utf-8")
+            return
+        if self.path == "/visual-polish-v02.css":
+            self._file(WEB_ROOT / "visual-polish-v02.css", "text/css; charset=utf-8")
+            return
+        if self.path == "/bilingual.css":
+            self._file(WEB_ROOT / "bilingual.css", "text/css; charset=utf-8")
+            return
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_POST(self) -> None:
