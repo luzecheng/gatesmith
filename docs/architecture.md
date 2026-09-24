@@ -120,3 +120,39 @@ These are safety limits for V0.1, not claims about the maximum X Layer circuit s
 本阶段没有 AI interpretation、钱包、Processor、tape-out 或 `eval()`；UI 中的确认只是对当前本地 compiled artifact 的人工确认，不是链上签名。
 
 M3 的 adapter 已经实现 `eval()` read-only 调用，但当前 UI 仍然不使用它；真实链上集成通过独立脚本和 integration test 执行。
+
+## Milestone 4 AI boundary
+
+M4 adds an optional proposal path:
+
+```text
+Browser
+  → POST /api/interpret
+  → gatesmith_ai provider adapter
+  → untrusted structured proposal
+  → deterministic parser validation
+  → Browser review/edit
+  → POST /api/build
+  → gatesmith_core authoritative truth table/compiler/evaluator
+```
+
+The AI adapter never creates a truth table, NAND topology, encoded bytes, hash,
+transaction, signature, or wallet action. It rejects proposals that try to
+provide those authoritative fields. `verified: false` and
+`authority: ai_proposal_only` are added by the local boundary, not supplied by
+the provider.
+
+Provider configuration is server-side only through `GATESMITH_AI_API_KEY` and
+optional `GATESMITH_AI_MODEL`. The adapter defaults to and only permits the
+official OpenRouter Chat Completions endpoint
+`https://openrouter.ai/api/v1/chat/completions`; a different
+`GATESMITH_AI_ENDPOINT` is rejected before any request, so the key cannot be
+sent to an arbitrary host. No credentials are read by the browser or written
+to logs/repository. With no key, the interpretation endpoint returns
+`ai_unavailable`, while `/api/build` remains fully usable.
+
+The browser displays AI output as `NOT VERIFIED`. The user may edit meanings,
+reject the proposal, or copy its expression into the existing Boolean input.
+Only the explicit Build Circuit action sends the expression to the
+authoritative deterministic core. Any change to the expression or proposed
+meanings invalidates the current local confirmation.

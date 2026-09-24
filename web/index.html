@@ -20,7 +20,17 @@
       </section>
 
       <section class="panel rule-panel">
-        <div class="panel-heading"><div><span class="step">01</span><h2>Describe your rule</h2></div><span class="hint">AND · OR · NOT · A–D</span></div>
+        <div class="panel-heading"><div><span class="step">01</span><h2>Describe your rule</h2></div><span class="hint">AI optional · local core required</span></div>
+        <label for="description">Plain-language rule <span class="optional">optional</span></label>
+        <div class="input-row"><textarea id="description" rows="2" placeholder="Allow access when Alice and Bob approve, or Carol approves."></textarea><button id="interpret">Ask AI <span>↗</span></button></div>
+        <div id="proposal" class="proposal" hidden>
+          <div class="proposal-heading"><span class="label">AI PROPOSED INTERPRETATION</span><span class="proposal-badge">NOT VERIFIED</span></div>
+          <div id="proposal-inputs" class="proposal-inputs"></div>
+          <div class="proposal-rule"><span class="label">PROPOSED BOOLEAN RULE</span><code id="proposal-expression"></code></div>
+          <p id="proposal-explanation" class="proposal-explanation"></p>
+          <div id="proposal-warning" class="proposal-warning" hidden></div>
+          <div class="proposal-actions"><button id="use-proposal" class="secondary-button">Use this expression</button><button id="reject-proposal" class="text-button">Reject</button></div>
+        </div>
         <label for="expression">Boolean expression</label>
         <div class="input-row"><input id="expression" value="(A AND B) OR C" autocomplete="off" spellcheck="false" /><button id="build">Build Circuit <span>↗</span></button></div>
         <p class="helper">Try: <button class="example" data-expression="(A AND B) OR C">(A AND B) OR C</button> <button class="example" data-expression="NOT (A OR B)">NOT (A OR B)</button></p>
@@ -42,7 +52,7 @@
         <details class="panel evidence-panel"><summary><span><span class="step">TECH</span> Circuit evidence</span><span class="details-toggle">View details +</span></summary><div class="evidence-grid"><div><span class="label">ENCODED NETLIST</span><code id="netlist-bytes"></code></div><div><span class="label">DETERMINISTIC SHA-256</span><code id="netlist-hash"></code></div></div></details>
       </section>
 
-      <footer><span>Milestone 2 · Local deterministic core</span><span>Wallet &amp; chain integration are not active</span></footer>
+      <footer><span>Milestone 4 · AI proposal + local deterministic core</span><span>AI is optional · Wallet &amp; chain integration are not active</span></footer>
     </main>
     <script src="/app.js"></script>
   </body>

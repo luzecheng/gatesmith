@@ -32,10 +32,12 @@ from gatesmith_xlayer import (
     XLayerConfig,
     WrongChain,
 )
+from gatesmith_ai import AIInterpretationError, ProviderUnavailable, interpret_rule
 
 
 ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
+AI_PROVIDER = None
 
 
 def build_circuit(expression_source: str) -> dict:
@@ -81,6 +83,11 @@ def read_only_eval(payload: dict) -> dict:
     return evidence.as_dict()
 
 
+def propose_interpretation(rule_text: str) -> dict:
+    """Return an untrusted proposal; deterministic build remains separate."""
+    return interpret_rule(rule_text, provider=AI_PROVIDER)
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "GateSmithLocal/0.1"
 
@@ -124,7 +131,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_POST(self) -> None:
-        if self.path not in ("/api/build", "/api/xlayer/eval"):
+        if self.path not in ("/api/build", "/api/interpret", "/api/xlayer/eval"):
             self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
             return
         try:
@@ -133,12 +140,24 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == "/api/xlayer/eval":
                 self._json(HTTPStatus.OK, {"ok": True, "evidence": read_only_eval(payload)})
                 return
+            if self.path == "/api/interpret":
+                description = payload.get("description")
+                if not isinstance(description, str):
+                    raise AIInterpretationError("description must be a string")
+                self._json(HTTPStatus.OK, {"ok": True, "proposal": propose_interpretation(description)})
+                return
             source = payload.get("expression")
             if not isinstance(source, str):
                 raise ParseError("expression must be a string")
             result = build_circuit(source)
         except ParseError as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "syntax_error", "message": str(exc)})
+            return
+        except ProviderUnavailable as exc:
+            self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": "ai_unavailable", "message": str(exc)})
+            return
+        except AIInterpretationError as exc:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "ai_invalid_proposal", "message": str(exc)})
             return
         except WrongChain as exc:
             self._json(HTTPStatus.BAD_GATEWAY, {"error": "wrong_chain", "message": str(exc)})
