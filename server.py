@@ -7,6 +7,7 @@ import hashlib
 import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import os
 from pathlib import Path
 import sys
 
@@ -19,6 +20,17 @@ from gatesmith_core import (
     enumerate_inputs,
     parse,
     truth_table,
+)
+from gatesmith_xlayer import (
+    AdapterError,
+    ContractUnavailable,
+    DecodeError,
+    EvalReverted,
+    MalformedRpcResponse,
+    RpcUnavailable,
+    XLayerAdapter,
+    XLayerConfig,
+    WrongChain,
 )
 
 
@@ -49,6 +61,24 @@ def build_circuit(expression_source: str) -> dict:
         "netlist_bytes": encoded.hex(),
         "netlist_sha256": hashlib.sha256(encoded).hexdigest(),
     }
+
+
+def read_only_eval(payload: dict) -> dict:
+    """Minimal development evidence endpoint; it can only perform eth_call."""
+    processor = payload.get("processor") or os.environ.get("GATESMITH_XLAYER_PROCESSOR", "")
+    rpc_url = os.environ.get("GATESMITH_XLAYER_RPC_URL", "https://rpc.xlayer.tech")
+    circuit_id = payload.get("circuit_id")
+    input_hex = payload.get("input", "")
+    if not isinstance(circuit_id, int) or circuit_id < 0:
+        raise ValueError("circuit_id must be a non-negative integer")
+    if not isinstance(input_hex, str) or not input_hex.startswith("0x") or len(input_hex[2:]) % 2:
+        raise ValueError("input must be an even-length 0x hex string")
+    try:
+        input_bytes = bytes.fromhex(input_hex[2:])
+    except ValueError as exc:
+        raise ValueError("input is not valid hex") from exc
+    evidence = XLayerAdapter(XLayerConfig(rpc_url=rpc_url, processor_address=processor)).eval(circuit_id, input_bytes)
+    return evidence.as_dict()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -94,12 +124,15 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_POST(self) -> None:
-        if self.path != "/api/build":
+        if self.path not in ("/api/build", "/api/xlayer/eval"):
             self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
             return
         try:
             length = int(self.headers.get("Content-Length", "0"))
             payload = json.loads(self.rfile.read(length))
+            if self.path == "/api/xlayer/eval":
+                self._json(HTTPStatus.OK, {"ok": True, "evidence": read_only_eval(payload)})
+                return
             source = payload.get("expression")
             if not isinstance(source, str):
                 raise ParseError("expression must be a string")
@@ -107,8 +140,24 @@ class Handler(BaseHTTPRequestHandler):
         except ParseError as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "syntax_error", "message": str(exc)})
             return
+        except WrongChain as exc:
+            self._json(HTTPStatus.BAD_GATEWAY, {"error": "wrong_chain", "message": str(exc)})
+            return
+        except RpcUnavailable as exc:
+            self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": "rpc_unavailable", "message": str(exc)})
+            return
+        except ContractUnavailable as exc:
+            self._json(HTTPStatus.BAD_GATEWAY, {"error": "contract_unavailable", "message": str(exc)})
+            return
+        except EvalReverted as exc:
+            self._json(HTTPStatus.BAD_GATEWAY, {"error": "contract_revert", "message": str(exc)})
+            return
+        except (DecodeError, MalformedRpcResponse, AdapterError) as exc:
+            self._json(HTTPStatus.BAD_GATEWAY, {"error": "decode_failure", "message": str(exc)})
+            return
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
-            self._json(HTTPStatus.BAD_REQUEST, {"error": "compiler_error", "message": str(exc)})
+            error = "malformed_eval_input" if self.path == "/api/xlayer/eval" else "compiler_error"
+            self._json(HTTPStatus.BAD_REQUEST, {"error": error, "message": str(exc)})
             return
         self._json(HTTPStatus.OK, {"ok": True, "result": result})
 

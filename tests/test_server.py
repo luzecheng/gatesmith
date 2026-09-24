@@ -21,10 +21,10 @@ class ApiTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
 
-    def request(self, expression):
+    def request(self, expression, path="/api/build"):
         connection = HTTPConnection("127.0.0.1", self.port)
-        body = json.dumps({"expression": expression})
-        connection.request("POST", "/api/build", body, {"Content-Type": "application/json"})
+        body = json.dumps({"expression": expression} if path == "/api/build" else expression)
+        connection.request("POST", path, body, {"Content-Type": "application/json"})
         response = connection.getresponse()
         payload = json.loads(response.read())
         connection.close()
@@ -63,6 +63,11 @@ class ApiTests(unittest.TestCase):
         self.assertIn("expressionInput.addEventListener('input'", source)
         self.assertIn("invalidateConfirmation()", source)
         self.assertIn("confirmButton.disabled = !currentResult", source)
+
+    def test_read_only_endpoint_rejects_malformed_eval_input(self):
+        status, payload = self.request({"circuit_id": 1, "input": "0x01"}, "/api/xlayer/eval")
+        self.assertEqual(status, 400)
+        self.assertEqual(payload["error"], "malformed_eval_input")
 
 
 if __name__ == "__main__":

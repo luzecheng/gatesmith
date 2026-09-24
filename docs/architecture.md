@@ -22,12 +22,26 @@ Browser UI
   → Python server boundary
   → gatesmith_core authoritative implementation
   → JSON metadata for rendering
+
+M3 增加独立的只读链路：
+
+```text
+Browser / development evidence view
+  → POST /api/xlayer/eval
+  → gatesmith_xlayer read-only adapter
+  → eth_chainId
+  → eth_getCode
+  → eth_call
+  → Processor.eval()
+```
+
+`gatesmith_xlayer` 不被 `gatesmith_core` 导入。它只构造 `eval(uint256,bytes)` calldata、读取合约和解码返回值，没有 wallet、private key、签名或 write method。RPC URL 和 Processor address 通过配置提供，不把网络错误伪装成 Circuit 失败。
 ```
 
 浏览器没有重新实现 parser、compiler 或 evaluator。API 在返回结果前还会使用 NAND evaluator 对 truth table 做一次一致性检查。该 boundary 只在本地提供 HTTP，不连接 AI、wallet、RPC 或 X Layer。
 ```
 
-代码不依赖 React、AI provider、wallet、RPC 或 TapeOut frontend。
+M1 deterministic core 不依赖 React、AI provider、wallet、RPC 或 TapeOut frontend。M3 的 RPC 依赖只存在于独立 `gatesmith_xlayer` adapter。
 
 ## Grammar
 
@@ -104,3 +118,5 @@ These are safety limits for V0.1, not claims about the maximum X Layer circuit s
 当前 UI 只覆盖 `Rule → Verify → Circuit`：输入 expression、调用本地 Python core、展示 normalized rule、完整 truth table、Circuit summary、bytes/hash technical evidence，以及本地 `Confirm Rule` 状态。修改输入会使此前确认失效。
 
 本阶段没有 AI interpretation、钱包、Processor、tape-out 或 `eval()`；UI 中的确认只是对当前本地 compiled artifact 的人工确认，不是链上签名。
+
+M3 的 adapter 已经实现 `eval()` read-only 调用，但当前 UI 仍然不使用它；真实链上集成通过独立脚本和 integration test 执行。
