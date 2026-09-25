@@ -191,9 +191,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"GateSmith local UI: http://127.0.0.1:{port}", flush=True)
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8765"))
+    server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
+    print(f"GateSmith local UI: http://0.0.0.0:{port}", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
